@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Universal Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Background Styling */
+        body {
+            background: linear-gradient(135deg, #141E30, #243B55);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Dashboard Container */
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: 20px;
+            color: #00d4ff;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        th {
+            background: #00d4ff;
+            color: black;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ffcc00;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        /* Button Styling */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #ffcc00);
+            color: black;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #ff4757, #ffcc00);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ff4757, #ff6b6b);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #ff0000, #ff4757);
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff4757, #ff6b6b);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #ff0000, #ff4757);
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background-color: rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+            display: block;
+        }
+
+        .error {
+            background-color: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            display: block;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="logoutBtn" class="logout-btn">Logout</button>
+
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <h2>Users</h2>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            <tbody id="userTable">
+                <!-- Users will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <h2>Add User</h2>
+        <form id="userForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="candidate">Candidate</option>
+                </select>
+            </div>
+            <div class="form-group" id="profileImgGroup" style="display: none;">
+                <label for="profileImg">Profile Image</label>
+                <input type="file" id="profileImg" name="profileImg" accept="image/*">
+            </div>
+            <button type="submit" class="btn">Add User</button>
+        </form>
+
+        <h2>Publish Results</h2>
+        <div class="button-container">
+            <a href="publish_results.html" class="btn">Publish Results</a>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch users when page loads
+            fetchUsers();
+
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                const formData = new FormData();
+                formData.append('logout', true);
+
+                fetch('backend.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            // // Add user form submission
+            // document.getElementById('userForm').addEventListener('submit', function(event) {
+            //     event.preventDefault();
+                
+            //     const formData = new FormData(this);
+            //     formData.append('add_user', true);
+                
+            //     fetch('backend.php', {
+            //         method: 'POST',
+            //         body: formData
+            //     })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         if (data.status === 'success') {
+            //             showStatusMessage(data.message, 'success');
+            //             document.getElementById('userForm').reset();
+            //             fetchUsers();
+            //         } else {
+            //             showStatusMessage(data.message, 'error');
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         showStatusMessage('An error occurred. Please try again.', 'error');
+            //     });
+            // });
+        });
+
+        // Fetch users from backend
+        function fetchUsers() {
+            fetch('backend.php?get_users=true')
+                .then(response => response.json())
+                .then(users => {
+                    const userTable = document.getElementById('userTable');
+                    userTable.innerHTML = '';
+
+                    users.forEach(user => {
+                        const row = document.createElement('tr');
+                        
+                        const usernameCell = document.createElement('td');
+                        usernameCell.textContent = user.username;
+                        
+                        const roleCell = document.createElement('td');
+                        roleCell.textContent = user.role;
+                        
+                        const actionsCell = document.createElement('td');
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = 'Delete';
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.onclick = function() {
+                            deleteUser(user.username);
+                        };
+                        
+                        actionsCell.appendChild(deleteBtn);
+                        
+                        row.appendChild(usernameCell);
+                        row.appendChild(roleCell);
+                        row.appendChild(actionsCell);
+                        
+                        userTable.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching users:', error);
+                    showStatusMessage('Error fetching users. Please try again.', 'error');
+                });
+        }
+
+        // Delete user function
+        function deleteUser(username) {
+            if (confirm(`Are you sure you want to delete user "${username}"?`)) {
+                const formData = new FormData();
+                formData.append('delete_user', true);
+                formData.append('username', username);
+                
+                fetch('backend.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showStatusMessage(data.message, 'success');
+                        fetchUsers();
+                    } else {
+                        showStatusMessage(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showStatusMessage('An error occurred. Please try again.', 'error');
+                });
+            }
+        }
+
+        // Show status message
+        function showStatusMessage(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message ' + type;
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                statusElement.className = 'status-message';
+                statusElement.textContent = '';
+            }, 3000);
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+    fetchUsers();
+
+    document.getElementById('logoutBtn').addEventListener('click', async function() {
+        const formData = new FormData();
+        formData.append('logout', true);
+
+        try {
+            const response = await fetch('backend.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                window.location.href = 'index.html';
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    });
+
+    document.getElementById('userForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(this);
+    formData.append('add_user', true);
+
+    console.log('Form Data Entries:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Adding...';
+
+    try {
+        const response = await fetch('backend.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        console.log('Response Status:', response.status);
+
+        const data = await response.json();
+        console.log('Response Data:', data);
+
+        if (data.status === 'success') {
+            showStatusMessage(data.message, 'success');
+            this.reset();
+            document.getElementById('profileImgGroup').style.display = 'none'; // Hide image input after submit
+            fetchUsers();
+        } else {
+            showStatusMessage(data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error adding user:', error);
+        showStatusMessage('An error occurred. Please try again.', 'error');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Add User';
+    }
+});
+
+    
+});
+document.getElementById('role').addEventListener('change', function() {
+    const profileImgGroup = document.getElementById('profileImgGroup');
+    profileImgGroup.style.display = this.value === 'candidate' ? 'block' : 'none';
+});
+    </script>
+
+</body>
+</html>
+

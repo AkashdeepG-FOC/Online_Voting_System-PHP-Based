@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Election</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #121212;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+        .candidate-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .candidate-card {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    padding: 20px;
+    width: 200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-theme .candidate-card {
+    background: #333; /* Dark theme background */
+    color: #fff;
+    border: 1px solid #555;
+}
+        .candidate-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .candidate-card h3 {
+            margin-bottom: 10px;
+            cursor: pointer;
+            color:  #000000; 
+        }
+        .candidate-card h3:hover {
+            color: #007bff; 
+        }
+        .vote-btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .vote-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .theme-toggle:hover {
+            background-color: #0056b3;
+        }
+        
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #ff0000;
+        }
+        
+        .status-message {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .success {
+            background-color: rgba(46, 204, 113, 0.8);
+            color: white;
+            display: block;
+        }
+        
+        .error {
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>College Election - Vote for Your Candidate</h1>
+    <div id="statusMessage" class="status-message"></div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+    <div class="candidate-grid">
+        <!-- Candidates will be loaded dynamically -->
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark/Light Theme</button>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                const formData = new FormData();
+                formData.append('logout', true);
+
+                fetch('backend.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+            
+            // Load candidates
+            loadCandidates();
+        });
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            let currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+        }
+        
+        // Show status message
+        function showStatusMessage(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message ' + type;
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                statusElement.className = 'status-message';
+                statusElement.textContent = '';
+            }, 3000);
+        }
+
+        function loadCandidates() {
+            fetch('backend.php?get_results=true')
+                .then(response => response.json())
+                .then(candidates => {
+                    const grid = document.querySelector('.candidate-grid');
+                    grid.innerHTML = candidates.map(candidate => `
+                        <div class="candidate-card">
+                      <img src="uploads/${candidate.image}" alt="${candidate.username}">
+
+
+                            <h3>${candidate.username}</h3>
+                            <button onclick="vote(${candidate.id}, '${candidate.username}')" class="vote-btn">Vote</button>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error('Error loading candidates:', error);
+                    showStatusMessage('Error loading candidates. Please try again.', 'error');
+                });
+        }
+
+        function vote(candidateId, candidateName) {
+            const formData = new FormData();
+            formData.append('vote', true);
+            formData.append('candidate', candidateId);
+
+            fetch('backend.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showStatusMessage(`Vote for ${candidateName} recorded successfully!`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'thank_you.html';
+                    }, 2000);
+                } else {
+                    showStatusMessage(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatusMessage('An error occurred. Please try again.', 'error');
+            });
+        }
+
+        // Apply saved theme on page load
+        window.onload = function() {
+            let savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        }
+    </script>
+</body>
+</html>
+
